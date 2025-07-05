@@ -1,0 +1,32 @@
+{
+    "name": "habitica-auto-party-invites",
+    "version": "1.0.0",
+    "description": "A tool for automatically inviting users to Habitica parties.",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "lint": "eslint ."
+    },
+    "author": "Josiah Dudzik",
+    "license": "GPL-3.0",
+    "homepage": "https://github.com/JDudzik/habitica-auto-party-invites",
+    "bugs": {
+        "url": "https://github.com/JDudzik/habitica-auto-party-invites/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/JDudzik/habitica-auto-party-invites.git"
+    },
+    "dependencies": {
+        "axios": "^1.10.0"
+    },
+    "devDependencies": {
+        "@eslint/compat": "^1.2.8",
+        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/js": "^9.23.0",
+        "eslint": "^9.28.0",
+        "eslint-plugin-import": "^2.25.3",
+        "globals": "^16.0.0",
+        "typescript": "^5.8.3"
+    }
+}

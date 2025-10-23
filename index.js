@@ -86,13 +86,13 @@ async function autoPartyInvite() {
     // Fetch users looking for party (LFP) from Habitica API.
     const response = await fetchLFPUsers();
 
-    const inviteeUserList = response?.data?.data
+    const inviteeUserList = response
       .filter(validateUserCriteria) // Filter users based on criteria.
       .filter(Boolean); // Remove anything that is not a valid user object.
 
     // Log every user that is seen.
-    if (response?.data?.data?.length > 0) {
-      const seenUsersLogData = response.data.data.map(user => ({
+    if (response?.length > 0) {
+      const seenUsersLogData = response.map(user => ({
         name: user.profile.name,
         invitedThisTime: inviteeUserList.some(invitee => invitee._id === user._id),
         lvl: user.stats.lvl,
@@ -104,14 +104,14 @@ async function autoPartyInvite() {
       writeLog(JSON.stringify(seenUsersLogData, null, 2));
     }
     
-    if (inviteeUserList.length > 0) {
+    if (inviteeUserList?.length > 0) {
       await inviteUsers(inviteeUserList);
     } else {
-      console.log(`No users to invite. Retry in ${ fetchInterval } seconds.`);
+      console.log(`No users to invite (Saw ${ response.length } users). Retry in ${ fetchInterval } seconds.`);
     }
   } catch (error) {
     console.error(`Something went wrong: ${ error.message }`);
-    writeErrorLog(JSON.stringify(error, null, 2));
+    writeErrorLog(JSON.stringify({ message: error.message, stack: error.stack }, null, 2));
   }
 }
 
@@ -135,7 +135,7 @@ async function fetchLFPUsers() {
   } catch (error) {
     console.error(`Failed to fetch LFP users: ${ error.message }`);
     writeErrorLog(JSON.stringify(error, null, 2));
-    return {};
+    return false;
   }
 }
 

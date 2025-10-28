@@ -10,6 +10,7 @@ This script automates the process of inviting Habitica users who meet specific c
   - Minimum number of logins.
   - Preferred language.
 - You can set the search interval.
+- You will receive a notification message on Habitica whenever a user has been invited to your party.
 - You can provide a separate admin user (who searches for party members) and an inviter user (who invites the user into their party). Very useful if you're a member and not the leader of your party.
 - This script keeps track of previously invited users in order to prevent spam.
 - Keeps logs of every user the script has seen even if they didn't meet the criteria. Useful for checking that your criteria is accurate.
@@ -55,6 +56,7 @@ npm run start
 | `--min-lvl`           | Minimum level required for users to be invited.                           | `--min-lvl 10`                   |
 | `--min-logins`        | Minimum number of logins required for users to be invited.                | `--min-logins 5`                 |
 | `--language`          | Preferred language of users to be invited.                                | `--language en`                  |
+| `--no-notification`   | This is disable sending a notification to yourself when a user is invited.| `--no-notification`              |
 
 ### Example Command
 
@@ -69,14 +71,11 @@ This feature is mostly helpful in the situation that your character is in a part
 - The inviter should be in the party you want to invite those players into.
 
 ## Logs
-
 - **Seen Users Log**: Logs all users fetched from the Habitica API, including their details and whether they were invited. Saved in `logs/seenUserData.log`.
 - **Error Log**: Logs errors encountered during execution. Saved in `logs/errors.log`.
 
 ## Data Persistence
-
 The script keeps track of invited users in `/data/invitedUsers.json` to avoid re-inviting the same user within a short timespan.
 
 ## License
-
 This project is licensed under the GPL-V3 License. See the LICENSE file for details.

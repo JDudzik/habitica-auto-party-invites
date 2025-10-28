@@ -17,6 +17,7 @@ let minLvl = 0;
 let minLogins = 0; // Minimum number of logins required
 let fetchInterval = 60; // Default fetch interval in seconds
 let language = '';
+let sendSelfNotification = true;
 
 
 // Parse command-line arguments
@@ -30,6 +31,7 @@ args.forEach((arg, index) => {
   if (arg === '--min-lvl') { minLvl = parseInt(args[index + 1], 10); }
   if (arg === '--min-logins') { minLogins = parseInt(args[index + 1], 10); }
   if (arg === '--language') { language = args[index + 1]; }
+  if (arg === '--no-notification') { sendSelfNotification = false; }
 });
 
 if (fetchInterval < 30) {
@@ -139,6 +141,29 @@ async function fetchLFPUsers() {
   }
 }
 
+
+async function sendInvitedNotification(invitedUser) {
+  if (!sendSelfNotification) { return; }
+
+  try {
+    await axios.post('https://habitica.com/api/v3/members/send-private-message', {
+      message: `### Habitica-Auto-Party-Invites:\nInvited **${ invitedUser.profile.name }** to the party.`,
+      toUserId: alternativeInviterUser?.apiUser || adminUser.apiUser,
+    }, {
+      headers: {
+        'content-type': 'application/json',
+        'x-client': 'b6ae607d-ad3b-4086-ae5a-e511c4cb24d7-AutoPartyInvites',
+        'x-api-user': alternativeInviterUser?.apiUser || adminUser.apiUser,
+        'x-api-key': alternativeInviterUser?.apiKey || adminUser.apiKey,
+      },
+    });
+  } catch (error) {
+    console.error(`Failed to send invite notification: ${ error.message }`);
+    writeErrorLog(JSON.stringify(error, null, 2));
+  }
+}
+
+
 async function inviteUsers(inviteeUsers) {
   try {
     // Make POST request to Habitica API
@@ -160,6 +185,9 @@ async function inviteUsers(inviteeUsers) {
         lvl: user.stats.lvl,
         logins: user.loginIncentives,
       };
+
+      // Send self-notification about invited user.
+      sendInvitedNotification(user);
     });
     fs.writeFileSync(invitedUsersFilePath, JSON.stringify(invitedUsersData, null, 2));
 

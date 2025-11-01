@@ -193,6 +193,12 @@ async function inviteUsers(inviteeUsers) {
 
     console.log(`Invited ${ inviteeUsers.length } user(s) named ${ inviteeUsers.map(user => user.profile.name).join(', ') } at ${ new Date().toLocaleTimeString() }. Relaunching in ${ fetchInterval } seconds.`);
   } catch (error) {
+    if (error?.response?.data?.success === false) {
+      console.log('Habitica rejected a request:', error?.response?.data?.message || 'Unknown error');
+      console.log('Exiting the script.');
+      writeErrorLog(JSON.stringify(error?.response?.data, null, 2));
+      process.exit(0);
+    }
     console.error(`Failed to invite user(s): ${ error.message }`);
     writeErrorLog(JSON.stringify(error, null, 2));
   }

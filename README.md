@@ -56,7 +56,7 @@ npm run start
 | `--min-lvl`           | Minimum level required for users to be invited.                           | `--min-lvl 10`                   |
 | `--min-logins`        | Minimum number of logins required for users to be invited.                | `--min-logins 5`                 |
 | `--language`          | Preferred language of users to be invited.                                | `--language en`                  |
-| `--no-notification`   | This is disable sending a notification to yourself when a user is invited.| `--no-notification`              |
+| `--no-notifications`   | This is to disable sending notifications to yourself on events like errors and sent invites. | `--no-notifications`              |
 
 ### Example Command
 

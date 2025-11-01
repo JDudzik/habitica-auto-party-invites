@@ -31,7 +31,7 @@ args.forEach((arg, index) => {
   if (arg === '--min-lvl') { minLvl = parseInt(args[index + 1], 10); }
   if (arg === '--min-logins') { minLogins = parseInt(args[index + 1], 10); }
   if (arg === '--language') { language = args[index + 1]; }
-  if (arg === '--no-notification') { sendSelfNotification = false; }
+  if (arg === '--no-notifications') { sendSelfNotification = false; }
 });
 
 if (fetchInterval < 30) {
@@ -109,7 +109,7 @@ async function autoPartyInvite() {
     if (inviteeUserList?.length > 0) {
       await inviteUsers(inviteeUserList);
     } else {
-      console.log(`No users to invite (Saw ${ response.length } users). Retry in ${ fetchInterval } seconds.`);
+      console.log(`No users to invite (Saw ${ response.length } users) at ${ new Date().toLocaleTimeString() }. Retry in ${ fetchInterval } seconds.`);
     }
   } catch (error) {
     console.error(`Something went wrong: ${ error.message }`);
@@ -135,6 +135,13 @@ async function fetchLFPUsers() {
     }
     return response?.data?.data;
   } catch (error) {
+    if (error?.response?.data?.success === false) {
+      const errorMessage = `Habitica returned an error: ${ error?.response?.data?.message || 'Unknown error' }.\n\nThe script has shut down.`; 
+      await notificationToAdmin(errorMessage);
+      console.log(errorMessage);
+      writeErrorLog(JSON.stringify(error?.response?.data, null, 2));
+      process.exit(0);
+    }
     console.error(`Failed to fetch LFP users: ${ error.message }`);
     writeErrorLog(JSON.stringify(error, null, 2));
     return false;
@@ -142,12 +149,12 @@ async function fetchLFPUsers() {
 }
 
 
-async function sendInvitedNotification(invitedUser) {
+async function notificationToAdmin(message) {
   if (!sendSelfNotification) { return; }
 
   try {
     await axios.post('https://habitica.com/api/v3/members/send-private-message', {
-      message: `### Habitica-Auto-Party-Invites:\nInvited **${ invitedUser.profile.name }** to the party.`,
+      message: `### Habitica-Auto-Party-Invites:\n${ message }`,
       toUserId: alternativeInviterUser?.apiUser || adminUser.apiUser,
     }, {
       headers: {
@@ -158,7 +165,7 @@ async function sendInvitedNotification(invitedUser) {
       },
     });
   } catch (error) {
-    console.error(`Failed to send invite notification: ${ error.message }`);
+    console.error(`Failed to send self-notification: ${ error.message }`);
     writeErrorLog(JSON.stringify(error, null, 2));
   }
 }
@@ -187,15 +194,16 @@ async function inviteUsers(inviteeUsers) {
       };
 
       // Send self-notification about invited user.
-      sendInvitedNotification(user);
+      notificationToAdmin(`Invited **${ user.profile.name }** to the party.`);
     });
     fs.writeFileSync(invitedUsersFilePath, JSON.stringify(invitedUsersData, null, 2));
 
     console.log(`Invited ${ inviteeUsers.length } user(s) named ${ inviteeUsers.map(user => user.profile.name).join(', ') } at ${ new Date().toLocaleTimeString() }. Relaunching in ${ fetchInterval } seconds.`);
   } catch (error) {
     if (error?.response?.data?.success === false) {
-      console.log('Habitica rejected a request:', error?.response?.data?.message || 'Unknown error');
-      console.log('Exiting the script.');
+      const errorMessage = `Habitica returned an error: ${ error?.response?.data?.message || 'Unknown error' }.\n\nThe script has shut down.`; 
+      await notificationToAdmin(errorMessage);
+      console.log(errorMessage);
       writeErrorLog(JSON.stringify(error?.response?.data, null, 2));
       process.exit(0);
     }

@@ -89,8 +89,8 @@ async function autoPartyInvite() {
     const response = await fetchLFPUsers();
 
     const inviteeUserList = response
-      ?.filter(validateUserCriteria) // Filter users based on criteria.
-      ?.filter(Boolean); // Remove anything that is not a valid user object.
+      ?.filter?.(validateUserCriteria) // Filter users based on criteria.
+      ?.filter?.(Boolean); // Remove anything that is not a valid user object.
 
     // Log every user that is seen.
     if (response?.length > 0) {

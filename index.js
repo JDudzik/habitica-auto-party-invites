@@ -83,7 +83,7 @@ setInterval(autoPartyInvite, fetchInterval * 1000);
 
 
 async function autoPartyInvite() {
-  console.log('Fetching users and inviting them to party...');
+  console.log('\nFetching users...');
   try {
     // Fetch users looking for party (LFP) from Habitica API.
     const response = await fetchLFPUsers();
@@ -109,7 +109,7 @@ async function autoPartyInvite() {
     if (inviteeUserList?.length > 0) {
       await inviteUsers(inviteeUserList);
     } else {
-      console.log(`No users to invite (Saw ${ response.length } users) at ${ new Date().toLocaleTimeString() }. Retry in ${ fetchInterval } seconds.`);
+      console.log(`No users matching criteria (Saw ${ response.length } users) at ${ new Date().toLocaleTimeString() }. Retry in ${ fetchInterval } seconds.`);
     }
   } catch (error) {
     console.error(`Something went wrong: ${ error.message }`);
@@ -222,13 +222,13 @@ function validateUserCriteria(user) {
     return false; // User language must match the specified language
   }
 
-  // Ignore users that have been invited within the last 36 hours.
+  // Ignore users that have been invited within the last 48 hours.
   // This is a courtesy to potential invitees, please do not reduce this timeframe.
   if (invitedUsersData[user._id]) {
     const lastInviteDate = new Date(invitedUsersData[user._id].lastInviteUTC);
     const now = new Date();
-    const thirtySixHoursAgo = new Date(now.getTime() - (36 * 60 * 60 * 1000)); // 36 hours ago
-    if (lastInviteDate >= thirtySixHoursAgo) {
+    const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000)); // 48 hours ago
+    if (lastInviteDate >= fortyEightHoursAgo) {
       return false;
     }
   }
